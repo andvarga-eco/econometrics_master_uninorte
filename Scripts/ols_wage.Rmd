@@ -1,0 +1,224 @@
+---
+title: "MCO para predicción"
+author: "Andrés Vargas"
+date: "2025-03-19"
+output: html_document
+---
+
+```{r, setup, include=FALSE, error=FALSE}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE, echo=TRUE)
+
+```
+
+
+Sea $Y$ el logarítmo del salario por hora y $\mathbf{X}$ un vector de características del trabajador, queremos responder la siguiente pregunta
+
+- ¿Cómo podemos usar las características del trabajador para predecir los salarios?
+
+
+Usaremos datos de la encuesta de población para EEUU en el periodo marzo 2015. La muestra está constituida por individuos blancos no hispanos para entre 25 y 64 años que hayan trabajado al menos 35 horas por semana en las últimas 50 semanas (¿Por qué cree que se hace esta restricción de muestra?). La muestra también excluye los trabajadores por cuenta propia, los militares, los trabajadores agrícolas. Los individuos son todos solteros
+
+```{r}
+requiredPackages = c('xtable', 'hdm', 'glmnet')
+
+for(p in requiredPackages){
+  
+  if(!require(p,character.only = TRUE)) install.packages(p)
+}
+
+library(xtable)
+library(hdm)
+library(glmnet)
+```
+
+
+
+
+### Cargar los datos y organizarlos
+
+```{r}
+file <- "https://raw.githubusercontent.com/CausalAIBook/MetricsMLNotebooks/main/data/wage2015_subsample_inference.csv"
+data <- read.csv(file)
+dim(data)
+```
+
+
+Creamos el vector $\mathbf{Y}$ con las observaciones de la variable dependiente, y la matriz $\mathbf{Z}$ con los regresores
+
+```{r}
+y <- log(data$wage)
+n <- length(y)
+Z <- data[- which(colnames(data) %in% c("wage", "lwage"))]
+p <- dim(Z)[2]
+
+cat("Number of observations:", n, "\n")
+cat("Number of raw regressors:", p)
+
+```
+
+Calculamos la media muestral de las variables importantes
+
+```{r}
+Zsubset <- data[which(colnames(data) %in% c("lwage", "sex", "shs", "hsg", "scl",
+                                            "clg", "ad", "mw", "so", "we", "ne", "exp1"))]
+table <- matrix(0, 12, 1)
+table[1:12, 1] <- as.numeric(lapply(Zsubset, mean))
+rownames(table) <- c("Log Wage", "Female", "Some High School",
+                     "High School Graduate", "Some College", "College Graduate",
+                     "Advanced Degree", "Midwest", "South", "West", "Northeast", "Experience")
+colnames(table) <- c("Sample mean")
+tab <- xtable(table, digits = 2) # para exportarla a Latex
+knitr::kable(tab)
+```
+
+
+### Ejercicio de predicción
+
+Construimos una regla de predicción usando una relación lineal entre el salario y las características del trabajador
+
+
+$$
+\mathbf{Y}=\boldsymbol{\beta}'\mathbf{X}+\epsilon
+$$
+La evaluación del modelo de predicción se hará con los valores ajustados MSE y $R^2$ dentro y fuera de muestra. Para ellos debemos
+
+- Dividir la muetra entre una de entrenamiento y otra de evaluación
+- Usamos la muestra de entrenamiento para ajustar modelos alternativos
+- Evaluamos los modelos en la muestra de evaluación, es decir "fuera de muestra"
+
+Usaremos dos modelos
+
+- Básico: $\mathbf{X}$ contiente únicamente los regresores sin transformación, raw
+- Flexible: $\mathbf{X}$ contiene los regresores sin transformación más un diccionario de transformaciones e interacciones de dos vías, por ejemplo $exp\times clg$
+
+La estimación de los parámetros se hará con el estimador MCO
+
+#### Paso 1: Dividir la muestra
+
+```{r}
+#Variables categóricas como factores
+
+data$occ2<-factor(data$occ2)
+data$ind2<-factor(data$ind2)
+# Dividir la muestra
+set.seed(1) # to make the results replicable (we will generate random numbers)
+random <- sample(1:n, floor(n * 4 / 5)) # draw (4/5)*n random numbers from 1 to n without replacing
+train <- data[random, ]
+test <- data[-random, ]
+```
+
+
+#### Paso 2: Estimar los parámetros de los dos modelos
+
+**Modelo básico**
+
+```{r}
+basic <- lwage ~ (sex + exp1 + shs + hsg + scl + clg + mw + so + we + occ2 + ind2)
+regbasic <- lm(basic, data = train) # perform ols using the defined model
+# number of regressors in the Basic Model
+cat("Number of regressors in the basic model:", length(regbasic$coef), "\n")
+```
+
+
+**Modelo flexible**
+
+```{r}
+flex <- lwage ~ sex + shs + hsg + scl + clg + mw + so + we + occ2 + ind2 +
+  (exp1 + exp2 + exp3 + exp4) * (shs + hsg + scl + clg + occ2 + ind2 + mw + so + we)
+regflex <- lm(flex, data = train)
+# number of regressors in the Flexible Model
+cat("Number of regressors in the flexible model:", length(regflex$coef))
+```
+
+#### Evaluamos el poder predictivo dentro de muestra
+
+Usamos el $R^2$
+
+```{r}
+sumbasic <- summary(regbasic)
+sumflex <- summary(regflex)
+# no summary() for lassocv
+
+ntrain <- nrow(train)
+
+# R-squared and adjusted R-squared
+r2_1 <- sumbasic$r.squared
+cat("R-squared for the basic model: ", r2_1, "\n")
+r2_adj1 <- sumbasic$adj.r.squared
+cat("adjusted R-squared for the basic model: ", r2_adj1, "\n")
+
+r2_2 <- sumflex$r.squared
+cat("R-squared for the flexible model: ", r2_2, "\n")
+r2_adj2 <- sumflex$adj.r.squared
+cat("adjusted R-squared for the flexible model: ", r2_adj2, "\n")
+```
+
+Ahora con MSE
+
+```{r}
+mse1 <- mean(sumbasic$res^2)
+cat("MSE for the basic model: ", mse1, "\n")
+p1 <- sumbasic$df[1] # number of regressors
+mse_adj1 <- (ntrain / (ntrain - p1)) * mse1
+cat("adjusted MSE for the basic model: ", mse_adj1, "\n")
+
+mse2 <- mean(sumflex$res^2)
+cat("MSE for the flexible model: ", mse2, "\n")
+p2 <- sumflex$df[1]
+mse_adj2 <- (ntrain / (ntrain - p2)) * mse2
+cat("adjusted MSE for the flexible model: ", mse_adj2, "\n")
+
+```
+```{r}
+table <- matrix(0, 2, 5)
+table[1, 1:5] <- c(p1, r2_1, mse1, r2_adj1, mse_adj1)
+table[2, 1:5] <- c(p2, r2_2, mse2, r2_adj2, mse_adj2)
+colnames(table) <- c("p", "R2", "MSE", "R2adj", "MSEadj")
+rownames(table) <- c("Basic", "Flexible")
+knitr::kable(table)
+
+```
+
+
+#### Evaluación fuera de muestra
+
+```{r}
+yhat_bas <- predict(regbasic, newdata = test)
+y_test <- test$lwage
+plot(y_test,yhat_bas)
+mean_train <- mean(train$lwage)
+mse_test1 <- sum((y_test - yhat_bas)^2) / length(y_test)
+r2_test1 <- 1 - mse_test1 / mean((y_test - mean_train)^2)
+
+cat("Test MSE for the basic model: ", mse_test1, " ")
+cat("Test R2 for the basic model: ", r2_test1)
+```
+
+Para el modelo flexible
+
+```{r}
+yhat_flex<- predict(regflex, newdata = test)
+plot(y_test,yhat_flex)
+mse_test2 <- sum((y_test - yhat_flex)^2) / length(y_test)
+r2_test2 <- 1 - mse_test2 / mean((y_test - mean_train)^2)
+
+cat("Test MSE for the flex model: ", mse_test2, " ")
+cat("Test R2 for the flex model: ", r2_test1)
+
+```
+```{r}
+# Output the comparison table
+table2 <- matrix(0, 2, 2)
+table2[1, 1] <- mse_test1
+table2[2, 1] <- mse_test2
+table2[1, 2] <- r2_test1
+table2[2, 2] <- r2_test2
+
+rownames(table2) <- c("basic reg", "flexible reg")
+colnames(table2) <- c("MSEtest", "R2test")
+knitr::kable(table2)
+```
+
+#### Ejercicio
+
+Tome el modelo con todos los polinomios de experiencia y todas las interacciones de dos vías, excepto la variable sex. Realice la evaluación del modelo dentro y fuera de muestra ¿Por qué se dice que este modelo sobre ajusta?

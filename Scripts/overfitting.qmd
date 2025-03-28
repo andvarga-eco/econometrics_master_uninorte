@@ -1,0 +1,97 @@
+---
+title: "Overfitting"
+format: html
+editor: visual
+---
+
+## Ejemplo 1
+
+Suponga que $X\sim N(0,I_p)$ y $Y\sim N(0,1)$ son estadísticamente independientes. Por lo tanto el mejor predictor lineal de $Y$ es $\beta'X=0$ y $R_{pop}^2=0$
+
+### p=n
+
+```{r, message=FALSE}
+set.seed(123)
+n <- 1000
+
+p <- n
+X <- matrix(rnorm(n * p), n, p)
+y <- rnorm(n)
+
+summary(lm(y ~ X))$r.squared
+summary(lm(y ~ X))$adj.r.squared
+
+```
+
+### p=n/2
+
+```{r, message=FALSE}
+set.seed(123)
+n <- 1000
+
+p <- n/2
+X <- matrix(rnorm(n * p), n, p)
+y <- rnorm(n)
+summary(lm(y ~ X))$r.squared
+summary(lm(y ~ X))$adj.r.squared
+```
+
+## Ejemplo 2
+
+Simule el proceso $Y=3+3X+190X^2+e$
+
+```{r, message=FALSE}
+x=seq(0,1,by=0.01)
+e=rnorm(length(x),0,50)
+y=3+3*x+190*x^2+e
+```
+
+### Funciones de predicción
+
+1.  Regresión lineal
+
+```{r, message=FALSE}
+lineal=lm(y~x)
+```
+
+2.  Regresión Cuadrática
+
+```{r, message=FALSE}
+z=x^2
+cuadratica<-lm(y~x+z)
+```
+
+3.  Spilines
+
+```{r, message=FALSE}
+smoothspline = smooth.spline(x,y,df = 20)
+```
+
+```{r, message=FALSE}
+seq = seq(min(x), max(x), by = 0.001)
+predict = predict(cuadratica, list(x = seq, z = seq^2))
+plot(x,y, xlab = "X", ylab = "Y", )
+abline(lineal, col = "red")
+lines(seq,predict, col = "blue")
+lines(smoothspline, col = "green")
+```
+
+### Fuera de muestra
+
+```{r, message=FALSE}
+testx = seq(1.1,1.5, by =0.01)
+testy = 3 + 3*testx + 190*(testx)^2 + rnorm(length(testx),0,20)
+
+predict_lineal = predict(lineal, list(x= testx))
+predict_cuadratica= predict(cuadratica, list(x = testx, z = testx^2))
+predict_spline = predict(smoothspline,testx)
+```
+
+Calculamos MSE
+
+```{r, message=FALSE, warning=FALSE}
+library(MLmetrics)
+MSE(predict_lineal,testy)
+MSE(predict_cuadratica,testy)
+MSE(predict_spline$y,testy)
+```
