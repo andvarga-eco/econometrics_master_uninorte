@@ -3,7 +3,5 @@ Acá encontrará los materiales del curso de econometría de la Maestría en Eco
 
 ## Presentaciones
 
-1. [Predicción e inferencia causal](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/Eb-kQt3VOL5Pv6ly15wdO_MBntAsye_mwDxZkH3ZrIrKpw?e=gGddGT)
+1. [Predicción e inferencia causal](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/Ed7fCvbx4PFCki9BecGQjSoBVQOlC8gpbED3hmeqB1MvLQ?e=oAXCWh)
 
-
-## [Notas de clase](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EXoElXlIw9RPkOhiSztHFnUBriphtHqVLUtnsDHPWztNXA?e=039pHy)
