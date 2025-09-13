@@ -64,4 +64,24 @@ mse_adj_base = results_base.mse_resid
 print(f'Rsquared={rsquared_base:.4f}')
 print(f'Rsquared_adjusted={rsquared_adj_base:.4f}')
 print(f'MSE={mse_base:.4f}')
+
 print(f'MSE_adjusted={mse_adj_base:.4f}')
+
+# Ajuste fuera de muestra
+
+tmp = smf.ols(model_base, data=df)  # just to extract df, not actually using this model
+X_full = tmp.data.exog
+y_full = tmp.data.endog
+X_train, X_test, y_train, y_test = train_test_split(X_full, y_full, test_size=.2, shuffle=True)
+
+regbasic = sm.OLS(y_train, X_train).fit()
+
+# predict out of sample
+yhat_reg_base = regbasic.predict(X_test)
+
+# calculating out-of-sample MSE
+MSE_test1 = sum((y_test - yhat_reg_base)**2) / y_test.shape[0]
+R2_test1 = 1. - MSE_test1 / np.var(y_test)
+
+print("Test MSE for the basic model: " + str(MSE_test1))
+print("Test R2 for the basic model: " + str(R2_test1))
