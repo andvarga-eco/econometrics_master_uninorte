@@ -1,6 +1,8 @@
 # Objetivo
-Comparar el comportamiento del estimador MCO  y las medidas de bondad de ajuste, R2 Y MSE en la medida que aumenta la dimensionalidad. Utilizaremos los datos geih_24.xls
+Comparar el comportamiento del estimador MCO  y las medidas de bondad de ajuste, R2 Y MSE en la 
+medida que aumenta la dimensionalidad. Utilizaremos los datos geih_24.xls
 
-1. Tome como referencia el código wage_predict.py, restrinja la muestra para el modelo extraflexible en 200 para la muestra de entrenamiento
+1. Tome como referencia el código wage_predict.py, restrinja la muestra para el 
+modelo extraflexible en 200 para la muestra de entrenamiento
   a. Estime el modelo extraflexible y calcule el R2 y MSE dentro de muestra
   b. Relice la predicción sobre la muestra de testeo. Calcule R2 y MSE ¿Hay evidencia de sobre ajuste? ¿Por qué?
