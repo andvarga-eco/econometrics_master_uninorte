@@ -8,6 +8,6 @@ Acá encontrará los materiales del curso de econometría de la Maestría en Eco
 3. [LASSO](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/ETwK1rDqJHRBuTeT583eYtcBCjydJrGHlIX1WBcvTL7hiw?e=Pt9rRi)
 4. [Causal LASSO](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/Ea18_ljIOZRIjm_AIAl1OFMBUI_bWQkPpfs9jb5XFeVajQ?e=57I7Ll)
 5. [Identificación bajo ignorabilidad condicional](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/ERbX9oAECP5Ju_qI4e_niiEB2Emvq-DbaMV52mhg19ZeYQ?e=mmUfUq)
-6. [Ecuación lineal estructural e identificación]()
+6. [Ecuación lineal estructural e identificación](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/ETPuOyQaXZVMiIF9w-cH7L0BOSmucnj0Aslln16oS3V8_Q?e=KGCnfG)
 7. [Random Forest](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EdireD7AzdBMiWJF3n6hoiUB11mVxiaP-l_J-bAFodPwzA?e=aOP7dr)
 
