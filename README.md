@@ -10,4 +10,5 @@ Acá encontrará los materiales del curso de econometría de la Maestría en Eco
 5. [Identificación bajo ignorabilidad condicional](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/ERbX9oAECP5Ju_qI4e_niiEB2Emvq-DbaMV52mhg19ZeYQ?e=mmUfUq)
 6. [Ecuación lineal estructural e identificación](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/ETPuOyQaXZVMiIF9w-cH7L0BOSmucnj0Aslln16oS3V8_Q?e=KGCnfG)
 7. [Random Forest](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EdireD7AzdBMiWJF3n6hoiUB11mVxiaP-l_J-bAFodPwzA?e=aOP7dr)
+8. [Debiased Machine Learning: DML](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EVtcG21M7z1AnIIqnahJ2C0BRy16JbjMKCliO7CksyZn7g?e=GotoQi)
 
