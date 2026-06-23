@@ -12,3 +12,7 @@ Acá encontrará los materiales del curso de econometría de la Maestría en Eco
 7. [Random Forest](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EdireD7AzdBMiWJF3n6hoiUB11mVxiaP-l_J-bAFodPwzA?e=aOP7dr)
 8. [Debiased Machine Learning: DML](https://uninorte-my.sharepoint.com/:b:/g/personal/andresmv_uninorte_edu_co/EVtcG21M7z1AnIIqnahJ2C0BRy16JbjMKCliO7CksyZn7g?e=GotoQi)
 
+## Laboratorios
+
+[Introducción-microclase](https://colab.research.google.com/drive/11RBCFb9pgbxDdF7fnjct0vj0v9OCIvfL?usp=sharing)
+
